@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Journey - Steppe, Concrete, and Stage</title>
+    <style>
+        /* --- 1. 全局布局 --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* 禁止整页滚动 */
+            font-family: "Georgia", "Times New Roman", serif;
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* --- 2. 背景视频 --- */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: brightness(0.5); /* 压暗背景，突出文字 */
+            transition: opacity 0.5s ease; /* 视频切换时的淡入淡出 */
+        }
+
+        /* --- 3. 内容卡片 --- */
+        .story-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 900px;
+            height: 80vh; /* 占据视口高度的80% */
+            background: rgba(0, 0, 0, 0.6); /* 半透明黑色背景 */
+            backdrop-filter: blur(10px); /* 毛玻璃效果 */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        /* 章节标题 */
+        #chapter-title {
+            font-size: 2.5rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        #chapter-num {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #d4af37; /* 金色 */
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* 滚动文字区域 */
+        .text-scroll-area {
+            flex: 1; /* 占据剩余空间 */
+            overflow-y: auto; /* 允许垂直滚动 */
+            padding-right: 15px; /* 给滚动条留点位置 */
+            margin-bottom: 20px;
+        }
+
+        /* 滚动条美化 */
+        .text-scroll-area::-webkit-scrollbar { width: 8px; }
+        .text-scroll-area::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        .text-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+
+        p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        blockquote {
+            border-left: 4px solid #d4af37;
+            margin: 20px 0;
+            padding-left: 20px;
+            font-style: italic;
+            color: #f1c40f;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+        }
+
+        /* --- 4. 底部导航按钮 --- */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 20px;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 10px 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background: white;
+            color: black;
+        }
+
+        button:disabled {
+            border-color: #555;
+            color: #555;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* 动画 */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translate(-50%, -45%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        
+        /* 文字淡入效果 */
+        .fade-in-text {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="" type="video/mp4" id="video-source">
+    </video>
+
+    <div class="story-container">
+        <header>
+            <span id="chapter-num">Chapter 1</span>
+            <h1 id="chapter-title">The Silent Symphony</h1>
+        </header>
+
+        <div class="text-scroll-area" id="content-area">
+            </div>
+
+        <div class="nav-buttons">
+            <button id="btn-prev" onclick="changeChapter(-1)">Previous</button>
+            <button id="btn-next" onclick="changeChapter(1)">Next Chapter</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 数据配置 ---
+        // 这里存储了你所有的章节内容和对应的视频文件名
+        const chapters = [
+            {
+                id: 1,
+                title: "The Silent Symphony",
+                video: "chapter1.mp4",
+                content: `
+                    <p><strong>The Sensory World:</strong> I was born in 2000, into the vast, endless embrace of Xinjiang. My childhood was a sensory feast painted in the vibrant colors of the grasslands: the smell of roasted lamb, the warmth of fresh milk tea, the sound of wind racing through the valleys, and the laughter of my younger brother. It was a world that felt complete, boundless, and loud.</p>
+                    <p><strong>The Multilingual "Sack":</strong> Professor Li Wei speaks of a "linguistic repertoire," and mine was shaped early by the diverse voices of the frontier. I grew up in a sack of languages—thrown into it like Yoko Tawada describes. Uyghur, Mongolian, and Mandarin surrounded me. I saw them on street signs, heard them in the bazaar, and tasted them in the food. They were distinct melodies, yet they harmonized into the soundtrack of my daily life. I didn't just hear these languages; I lived in them.</p>
+                    <p><strong>The Alien Symbol:</strong> But English? English was not part of this symphony. In that ocean of sounds, English was a stone—silent, cold, and heavy. It appeared occasionally on obscure labels or distant advertisements, but to me, it was just a string of unrecognizable runes, a code without a key. It held no meaning, no emotion, and certainly no "self." In my world of 2000 to 2008, English was a ghost that haunted the edges of my vision but never touched my soul. It was a language of silence.</p>
+                    <blockquote>"Surrounded by the melody of familiar tongues, English was just a silent stone in my garden."</blockquote>
+                `
+            },
+            {
+                id: 2,
+                title: "The Mechanical Parrot",
+                video: "chapter2.mp4",
+                content: `
+                    <p><strong>The Concrete Jungle of Education:</strong> In 2008, I moved to Shandong, a province known as the heavy industrial base of Chinese education. The boundless grasslands were replaced by concrete classrooms and towering stacks of textbooks. Here, English was not a song; it was a subject. To catch up with the curriculum, I was enrolled in my first cram school.</p>
+                    <p><strong>Lost in Translation:</strong> "Phonetics is just like Pinyin," my teacher declared. This was my first lesson in what Professor Li Wei might call "cultural translation," but it was a clumsy one. I was taught to map the fluid sounds of English onto the rigid grid of Chinese Pinyin. I memorized terms I didn't understand—vowels, consonants, plosives—stripping the language of its soul to fit it into a box I recognized.</p>
+                    <p><strong>The Assembly Line:</strong> My learning became an act of mechanical reproduction. Like a machine, I copied letters into exercise books—a, a, a; b, b, b—row after row, page after page. The teacher’s pronunciation was flawed, but we repeated it in unison, a chorus of confusion. I became a mechanical parrot, mimicking sounds without grasping meaning. I knew how to say the words (barely), but I had no idea why I was saying them.</p>
+                    <blockquote>"I learned to mimic the sounds, effectively turning a language of connection into a sequence of mechanical noises."</blockquote>
+                `
+            },
+            {
+                id: 3,
+                title: "The Code of Rebellion",
+                video: "chapter3.mp4",
+                content: `
+                    <p><strong>The Foreign Language School:</strong> Middle school brought me to a "Foreign Language School." The name promised horizons, but the reality was still grounded in rote memorization. My first teacher was excellent but strict, forcing vocabulary into my head through sheer pressure. I retained the words, but I didn't feel them. My grades remained stagnant, trapped in the mediocrity of doing what I was told.</p>
+                    <p><strong>The Cool Factor:</strong> The turning point arrived with a private tutor who understood the mind of a rebellious teenager. He didn't show me grammar books; he showed me the world. He opened designer websites, indie game interfaces, and underground forums. Suddenly, English wasn't about exams; it was a velvet rope to an exclusive club. As Chris Hutton notes, a user’s motivation changes entirely when they aren't just a student, but a "punk rocker" seeking a different voice. I wanted to be that punk rocker. I wanted to be cool, unique, and distinct from the crowd.</p>
+                    <p><strong>The Awakening of "Sense":</strong> Driven by vanity and the desire to be different, I started reciting whole texts—not to pass tests, but to own that voice. This "clumsy" method became my enlightenment. In the rhythm of recitation, I stopped translating. I began to develop Yugan (语感)—a "language sense." I absorbed grammar, sentence structures, and nuances subconsciously. For the first time, English wasn't a subject I studied; it was a persona I inhabited.</p>
+                    <blockquote>"English became my secret code. It wasn't about grades anymore; it was about being different."</blockquote>
+                `
+            },
+            {
+                id: 4,
+                title: "Silence on the Plateau",
+                video: "chapter4.mp4",
+                content: `
+                    <p><strong>The Fading Colors:</strong> High school in Shandong was a washing machine that rinsed out all the vibrant colors of my "punk rocker" phase. The pressure of the Gaokao (National College Entrance Exam) demanded uniformity, not uniqueness. The desire to be "cool" was diluted by the overwhelming need to survive the system. As the poet Eric Yip writes, "You must learn to submit before you can learn". I submitted. The neon lights of my independent discovery were replaced by the fluorescent hum of the classroom.</p>
+                    <p><strong>The Weapon of Survival:</strong> English transformed once again. It was no longer a cultural bridge or a personal code; it was a set of data points to be mastered for a score. It became purely instrumental. Yet, this is where my past "rebellion" paid off.</p>
+                    <p><strong>The Smooth Path:</strong> Because of those days spent reciting texts for vanity, the "language sense" I had built became my armor. While others struggled with grammar rules and vocabulary lists, I found myself walking through the storm unobstructed. I didn't need to analyze the language because I could feel it. But it was a silent victory. For three years, my English proficiency plateaued—stable, strong, but stagnant. It was a tool kept sharp in a sheath, waiting for a real battle that never came.</p>
+                    <blockquote>"I navigated the sea of exams with a boat built from my past rebellion. The journey was smooth, but the scenery never changed."</blockquote>
+                `
+            },
+            {
+                id: 5,
+                title: "Breaking the Cocoon",
+                video: "chapter5.mp4",
+                content: `
+                    <p><strong>The Dazzling Maze:</strong> Arriving in Hong Kong felt less like a choice and more like destiny’s consolation prize. I walked into this city with high exam scores but a closed mouth. The environment was dazzling—a kaleidoscope of full English immersion and global perspectives. But for a long time, I was just a spectator. I was overwhelmed by the city’s brilliance and my own hesitation. I was "busy" navigating life, yet stagnant in my voice. I lived in English, but I didn't live through it.</p>
+                    <p><strong>The Wall of Silence:</strong> As graduation approached, the pressure of "involution" (neijuan) among peers became suffocating. My biggest barrier wasn't vocabulary or grammar—my "mechanical" years had secured those. My barrier was psychological. I carried a fear of speaking, a fear of being judged, a fear that my voice wouldn't match the perfection of my written scores. I was trapped in a self-imposed silence, knowing I could speak, but terrified to try.</p>
+                    <p><strong>The Leap of Faith:</strong> Then came the school project—a mandatory presentation that left no room for hiding. It was the "push" I needed. I realized that nobody else would break this barrier for me. I stood on that stage, my heart pounding against my ribs. I forced the words out. And then, something shifted. As I spoke, the "shadowy person" of judgment (as described by Guo Xiaolu) vanished.</p>
+                    <p><strong>A New Voice:</strong> I didn't just deliver a presentation; I delivered myself from fear. I proved that the boy from the Xinjiang grasslands, the parrot from the Shandong classroom, and the silent student in Hong Kong were all leading to this moment. I found my voice not in perfection, but in the courage to be heard. English is no longer a stone or a tool; it is now, finally, my open door.</p>
+                    <blockquote>"I never lacked the ability; I only lacked the moment. When the glass wall shattered, I found not just a language, but a new version of myself."</blockquote>
+                `
+            }
+        ];
+
+        // --- 逻辑控制 ---
+        let currentIndex = 0; // 当前章节索引 (0-4)
+
+        const videoEl = document.getElementById('bg-video');
+        const videoSource = document.getElementById('video-source');
+        const titleEl = document.getElementById('chapter-title');
+        const numEl = document.getElementById('chapter-num');
+        const contentEl = document.getElementById('content-area');
+        const prevBtn = document.getElementById('btn-prev');
+        const nextBtn = document.getElementById('btn-next');
+
+        // 初始化页面
+        function init() {
+            renderChapter(0);
+        }
+
+        // 渲染指定章节
+        function renderChapter(index) {
+            const chapter = chapters[index];
+            
+            // 1. 切换文字内容 (添加淡入动画类)
+            contentEl.classList.remove('fade-in-text');
+            void contentEl.offsetWidth; // 触发重绘
+            contentEl.classList.add('fade-in-text');
+
+            numEl.textContent = `Chapter ${chapter.id}`;
+            titleEl.textContent = chapter.title;
+            contentEl.innerHTML = chapter.content;
+            
+            // 重置滚动条到顶部
+            contentEl.scrollTop = 0;
+
+            // 2. 切换视频
+            videoSource.src = chapter.video;
+            videoEl.load(); // 重新加载视频
+
+            // 3. 更新按钮状态
+            if (index === 0) {
+                prevBtn.disabled = true;
+                prevBtn.style.opacity = "0.5";
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.style.opacity = "1";
+            }
+
+            if (index === chapters.length - 1) {
+                nextBtn.textContent = "Back to Home";
+            } else {
+                nextBtn.textContent = "Next Chapter";
+            }
+        }
+
+        // 按钮点击事件处理
+        function changeChapter(direction) {
+            const newIndex = currentIndex + direction;
+
+            if (newIndex >= 0 && newIndex < chapters.length) {
+                currentIndex = newIndex;
+                renderChapter(currentIndex);
+            } else if (newIndex >= chapters.length) {
+                // 如果是最后一页再点Next，返回首页
+                window.location.href = 'index.html';
+            }
+        }
+
+        // 启动
+        init();
+    </script>
+
+</body>
+</html>
