@@ -16,38 +16,95 @@
             color: #fff;
         }
 
-        /* --- 2. 背景视频 --- */
-        #bg-video {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
-            filter: brightness(0.5); /* 压暗背景，突出文字 */
-            transition: opacity 0.5s ease; /* 视频切换时的淡入淡出 */
-        }
+/* --- 2. 背景视频优化 --- */
+#bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    filter: brightness(0.6); /* 稍微调暗背景 */
+    transition: opacity 0.5s ease;
+    
+    /* 【关键魔法】 */
+    /* 既然文字在左边，我们让视频显示的区域偏向右边 */
+    /* 这样原本在正中间的石头/鹦鹉，就会在视觉上出现在屏幕右侧的空白处 */
+    object-position: 70% center; 
+}
 
-        /* --- 3. 内容卡片 --- */
-        .story-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 900px;
-            height: 80vh; /* 占据视口高度的80% */
-            background: rgba(0, 0, 0, 0.6); /* 半透明黑色背景 */
-            backdrop-filter: blur(10px); /* 毛玻璃效果 */
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 40px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            animation: slideUp 0.8s ease-out;
-        }
+/* --- 3. 内容容器（侧边栏风格） --- */
+.story-container {
+    position: absolute;
+    top: 0;
+    left: 0; /* 靠左停靠 */
+    bottom: 0; /* 高度铺满 */
+    
+    width: 450px; /* 固定宽度，或者用 35% */
+    max-width: 90vw; /* 防止手机上太宽 */
+    
+    background: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.6)); /* 渐变黑背景 */
+    backdrop-filter: blur(10px); /* 毛玻璃效果 */
+    border-right: 1px solid rgba(255, 255, 255, 0.1); /* 右侧加一条淡淡的分界线 */
+    
+    padding: 60px 40px; /* 增加内边距，呼吸感更强 */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    
+    /* 移除之前的居中变换代码 */
+    transform: none; 
+    animation: slideRight 0.8s ease-out;
+}
+
+/* 调整标题大小，适应侧边栏 */
+#chapter-title {
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
+/* 调整正文区域 */
+.text-scroll-area {
+    margin-top: 20px;
+    margin-bottom: 30px;
+    /* 隐藏滚动条但保留功能（Webkit浏览器） */
+    scrollbar-width: thin; 
+    padding-right: 10px;
+}
+
+/* 手机端适配：变成底部卡片 */
+@media (max-width: 768px) {
+    #bg-video {
+        object-position: center center; /* 手机上恢复居中 */
+    }
+
+    .story-container {
+        top: auto;
+        bottom: 0; /* 靠底部 */
+        left: 0;
+        width: 100%; /* 宽度铺满 */
+        height: 60vh; /* 占据屏幕下半部分 */
+        max-width: 100%;
+        background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.7));
+        border-right: none;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        padding: 30px 20px;
+        animation: slideUp 0.6s ease-out;
+    }
+}
+
+/* 侧边栏滑入动画 */
+@keyframes slideRight {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* 手机端上滑动画 */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
         /* 章节标题 */
         #chapter-title {
